@@ -1,9 +1,10 @@
-# biocomp
-## Bioinformatics protocols for MCG members
+# BioComp: Bioinformatics protocols at WHOI
 
-_Sharon Grim, May 2023_
+_Sharon Grim, August 2023_
 
 This repository will hold documentation about using common 'omics analytical tools. Unless otherwise specified, these tools are installed on the **Poseidon HPC cluster**.
+
+Access the Github Page here: https://whoigit.github.io/biocomp/
 
 ---
 
