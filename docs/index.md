@@ -17,14 +17,13 @@ Access the Github Page here: https://whoigit.github.io/biocomp/
 
 3. Other bioinformatics protocols
   * [Submitting to NCBI's SRA](https://github.com/WHOIGit/biocomp/wiki/Uploading-to-NCBI-SRA-via-ASCP)
-  * [Lab protocols](https://github.com/WHOIGit/biocomp/docs/protocols.md)
-    * [Apprill Lab MiSeq Library Preparation](https://github.com/WHOIGit/biocomp/docs/protocols/ApprillLab_MiSeqLibraryPrep_SOP_Feb2024.pdf)
-    * [Lab protocols](docs/protocols.md)
-    * [Apprill Lab SOP for processing 16S rRNA gene amplicons through DADA2](https://github.com/WHOIGit/biocomp/docs/protocols/DADA2_decontam_ApprillLabProtocol.html)
+  * [Lab protocols](protocols.md)
+    * [Apprill Lab MiSeq Library Preparation](protocols/ApprillLab_MiSeqLibraryPrep_SOP_Feb2024.pdf)
+    * [Apprill Lab SOP for processing 16S rRNA gene amplicons through DADA2](protocols/DADA2_decontam_ApprillLabProtocol.html)
 
 4. Code snippets
-  * [Bandaging a metagenome-assembled-genomic bin](https://whoigit.github.io/biocomp/code-pages/snip-bandage.txt) (bash)
+  * [Bandaging a metagenome-assembled-genomic bin](code-pages/snip-bandage.txt) (bash)
   * [Slurm job management, Bash profiles](https://github.com/WHOIGit/biocomp/wiki/MCGOmics-Bash-20231004)
   * [Finding duplicate files](https://github.com/WHOIGit/biocomp/wiki/Finding-your-duplicate-files-on-the-server-20231005)
-  * [Parsing taxonomy of OTUs/ASVs](https://whoigit.github.io/biocomp/code-pages/taxonomy_parser.R) (R)
-  * [Evaluating significant differential abundance of ASVs using Kruskal-Wallis testing](https://whoigit.github.io/biocomp/code-pages/kw_test.R) (R)
+  * [Parsing taxonomy of OTUs/ASVs](code-pages/taxonomy_parser.R) (R)
+  * [Evaluating significant differential abundance of ASVs using Kruskal-Wallis testing](code-pages/kw_test.R) (R)
