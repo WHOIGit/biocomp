@@ -1,0 +1,111 @@
+# snip-bandage.txt
+# MIT License
+#
+# Copyright (c) 2023 microgrim / Sharon Grim <sharon.grim@whoi.edu>
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+###########
+
+# Usage: ./snip-bandage.txt Sample#
+
+# This snippet describes how I evaluated the de Brujin graph of contigs in a metagenomic assembly
+# to visualize the linkages between contigs and allow the user to curate their
+# metagenome-assembled-genomic (MAG) binning efforts.
+
+# We start with a metagenomic assembly from Megahit,
+# and a text file of the contigs in a MAG bin from Anvi'o.
+# We're using Megahit, bandage, and a Unix environment.
+
+# in this snippet, I worked in the directory "/geomicro/data7/sgrim/MIS2015-2017mtg/117911/"
+# the code in here is from 2016. I have not verified versions or updates of any software used. YMMV.
+
+##Names report: /geomicro/data7/sgrim/MIS2015-2017mtg/117911/117911-fixed.fa.namesreport
+#Bins: /geomicro/data7/sgrim/MIS2015-2017mtg/117911/METABAT/117911_bin*.fa
+#assembly file: /geomicro/data7/sgrim/MIS2015-2017mtg/117911/ASSEMBLY/k21_141_s12/intermediate_contigs
+
+###########
+
+# From the assembly, create the bandage-compatible fastg file.
+
+cd /geomicro/data7/sgrim/MIS2015-2017mtg/117911/ASSEMBLY/k21_141_s12/intermediate_contigs
+megahit_toolkit contig2fastg 141 k141.contigs.fa > 117911_k141.fastg
+
+#open 117911_k141.fastg in bandage
+
+#make the binning directory we need (a la anvio's summarize function)
+mkdir /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage/
+mkdir /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage/bin_by_bin/
+cd /geomicro/data7/sgrim/MIS2015-2017mtg/117911/METABAT/
+rename "s/117911_bin\./117911_bin_/" 117911_bin*.fa
+#rename "s/117911_bin_/117911_bin\./" 117911_bin*.fa
+
+for i in `ls 117911_bin*.fa | awk 'BEGIN{FS="."}{print $1}'`; do
+	mkdir /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage/bin_by_bin/$i
+	cd /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage/bin_by_bin/$i
+	ln -s /geomicro/data7/sgrim/MIS2015-2017mtg/117911/METABAT/$i.fa $i-contigs.fa
+	cd /geomicro/data7/sgrim/MIS2015-2017mtg/117911/METABAT/
+done
+
+###########
+
+# Use another script to extract the anvio-analyzed contigs and rename them to be compatible with the assembly:
+
+cd /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage
+# does this still exist?
+# wget https://github.com/tylerbarnum/perchlorate-metagenome-2018/raw/master/anvi-renamed-contigs-to-bandage-csv.py
+chmod a+x anvi-renamed-contigs-to-bandage-csv.py
+
+ls /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage/bin_by_bin/ > /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage/bin_names.txt
+
+python2 anvi-renamed-contigs-to-bandage-csv.py --bins /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage/bin_names.txt --directory /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage/ --delimiter "k141_" --report /geomicro/data7/sgrim/MIS2015-2017mtg/117911/117911-fixed.fa.namesreport --output /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage/all_bins_to_bandage.csv
+
+cd /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage
+ln -s /geomicro/data7/sgrim/MIS2015-2017mtg/117911/ASSEMBLY/k21_141_s12/intermediate_contigs/117911_k141.fastg .
+
+# get into an interactive session:
+# ssh -X {user}@{domain.com}
+# ssh -X {server}
+
+#bandage load 117911_k141.fastg 
+
+# So now that works. I want to manually check a bin I identified as a Spirulina sp.
+# that bin is labeled "bin_9" in my analyses.
+# I pull all the contigs labeled "bin_9" from the parsed contigs file:
+
+cd /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage
+grep "bin_9" all_bins_to_bandage.csv | awk 'BEGIN{FS=","}{print $1","}' > 117911_bin_9.nodes.txt
+
+# manually add some contigs I wanted to evaluate in the graph:
+#grep "c_000000670588" /geomicro/data7/sgrim/MIS2015-2017mtg/117911/117911-fixed.fa.namesreport
+#702880
+#c_000000453097
+#483248
+#c_000000542840
+#573756
+#add to the end of  117911_bin_9.nodes.txt
+printf "702880,\n483248,\n573756,\n" >> 117911_bin_9.nodes.txt
+
+tr -d '\n' < 117911_bin_9.nodes.txt > 117911_bin_9.inline.nodes.txt
+
+head 117911_bin_9.inline.nodes.txt
+
+cd /geomicro/data7/sgrim/MIS2015-2017mtg/117911/bandage
+bandage reduce 117911_k141.fastg 117911_bin_9.gfa --scope aroundnodes --distance 50 --nodes `cat 117911_bin_9.inline.nodes.txt`
+bandage load 117911_bin_9.gfa
