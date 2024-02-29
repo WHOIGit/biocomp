@@ -17,6 +17,9 @@ Access the Github Page here: https://whoigit.github.io/biocomp/
 
 3. Other bioinformatics protocols
   * [Submitting to NCBI's SRA](https://github.com/WHOIGit/biocomp/wiki/Uploading-to-NCBI-SRA-via-ASCP)
+  * [Lab protocols](https://github.com/WHOIGit/biocomp/docs/protocols.md)
+    * [Apprill Lab MiSeq Library Preparation](https://github.com/WHOIGit/biocomp/docs/protocols/ApprillLab_MiSeqLibraryPrep_SOP_Feb2024.pdf)
+    * [Apprill Lab SOP for processing 16S rRNA gene amplicons through DADA2](https://github.com/WHOIGit/biocomp/docs/protocols/DADA2_decontam_ApprillLabProtocol.html)
 
 4. Code snippets
   * [Bandaging a metagenome-assembled-genomic bin](https://whoigit.github.io/biocomp/code-pages/snip-bandage.txt) (bash)
