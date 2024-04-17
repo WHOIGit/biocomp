@@ -14,6 +14,7 @@ Access the Github Page here: https://whoigit.github.io/biocomp/
 
 2. Common analytical workflows for MCG members
    * [DESeq for differential expression analysis](https://github.com/WHOIGit/biocomp/wiki/MCGomics-Bash-20230802)
+   * [Example workflow of metagenomics analysis: from raw sequences to genes](https://whoigit.github.io/biocomp/protocols/omics_tools)
 
 3. [Other bioinformatics protocols](protocols.md)
   
