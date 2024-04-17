@@ -37,9 +37,9 @@ For this example, I can submit the job from anywhere in my space on the server, 
 
 ```
 sbatch --chdir=$SCRATCH/projects/ /proj/omics/bioinfo/scripts/slurm/mcgomics_fastp.sh \
-	$SCRATCH/project/fastqs \
-	$SCRATCH/project/fastp \
-	$SCRATCH/project/samplenames.txt
+ $SCRATCH/project/fastqs \
+ $SCRATCH/project/fastp \
+ $SCRATCH/project/samplenames.txt
 ```
 
 The samplenames.txt is a text file with one sample name per line, corresponding to the name of the FastQ file(s) (paired reads). 
@@ -187,7 +187,7 @@ module load singularity
 singularity shell \
  --cleanenv \
  --bind="/proj/omics/,/scratch/${USER},/user/${USER}" \
- /proj/omics/bioinfo/databases/nfx_singularity_cache/dastool_1.1.7.sif
+ /proj/omics/bioinfo/databases/nfx_singularity_cache/dastool.sif
 ```
 
 ---
