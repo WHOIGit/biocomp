@@ -6,4 +6,4 @@ I maintain and curate some references for routine analytical workflows. I am pro
 
 ### **Proof these modified references, before using them as doctrine.**
 
-
+- [Updates to SILVA 138 taxonomy](./refs/update_taxonomy.tsv)
