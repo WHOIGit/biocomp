@@ -1,8 +1,8 @@
 # Computational meta'omics workflow examples
 
 - Author: Sharon Grim
-- Version: 0.1 
-- Date: April 2024
+- Version: 0.2
+- Date: July 2026
 
 ---
 
@@ -10,28 +10,34 @@
 
 *You've come to (one of) the right place(s)!*
 
-This is an example workflow I used for processing and analyzing metagenomic samples in March and April 2024. Example scripts will be available as noted, and if you have access to the HPC, they will be in the ```/proj/omics/bioinfo``` space as well. Most of these tools are invoked via Singularity containers on the HPC, which are explicitly loaded in the wrapper scripts; if you choose to go off-cuff, please remember to wrap the job in either an ```srun``` or ```sbatch``` command.
+This is an example workflow I used for processing and analyzing metagenomic samples in March and April 2024 (*updated in 2026* ). Example scripts will be available as noted, and if you have access to the HPC, they will be in the ```/proj/omics/bioinfo``` space as well. Most of these tools are invoked via Singularity containers on the HPC, which are explicitly loaded in the wrapper scripts; if you choose to go off-cuff, please remember to wrap the job in either an ```srun``` or ```sbatch``` command.
 
 ---
 
-1. Raw read QC through FastP
+1. Raw read QC
+   A. FastP
+   B. Trimmomatic
 2. Metagenomic assembly through Megahit
 3. Choose Your Own Adventure
-    - 3A. Making MAG bins
+    - A. Making MAG bins
       - i. index assembly and map samples
       - ii. use metabat
       - iii.  assess bin quality and completion
-    - 3B. Gene calling
+    - B. Gene calling
       - i. Prokka
       - ii. Prodigal
     
 ---
 
-### 1. FastP to trim your reads.
+### 1. Quality control your raw reads.
    
-After you get your raw sequences, the first step in an 'omics workflow is quality control of your sequenced reads. I implemented QC and trimming of raw fastq files through [FastP](https://github.com/OpenGene/fastp), which I invoke on the HPC through a Singularity container. I wrapped the trimming and QC in a shell script (mcgomics_fastp.sh), and submitted the job to the Slurm scheduler:
+After you get your raw sequences, the first step in an 'omics workflow is quality control of your sequenced reads. I implemented QC and trimming of raw fastq files through [FastP](https://github.com/OpenGene/fastp) and [Trimmomatic](http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf), which I invoke on the HPC through a Singularity container. For both tools, I wrote SLURM scripts that use an input of your sample names reflecting the FASTQ files you want to process. The samplenames.txt is a text file with one sample name per line, corresponding to the name of the FastQ file(s) (paired reads). 
 
-```sbatch mcgomics_fastp.sh (input directory path* (output directory path) (optional text file of sample names)```
+#### A. FastP
+
+I wrapped the trimming and QC in a shell script (mcgomics_fastp.sh), and submitted the job to the Slurm scheduler:
+
+```sbatch mcgomics_fastp.sh (input directory path) (output directory path) (optional text file of sample names)```
 
 For this example, I can submit the job from anywhere in my space on the server, but I can change directories to my working space and use relative paths thereafter by using the ```--chdir``` flag prior to the submission script. (You can also override any resource requests in the shell script, by including the appropriate flags in between sbatch and the name of the script. See my below examples where I gradually lengthen the command line submission with these flags...)
 
@@ -42,8 +48,6 @@ sbatch --chdir=$SCRATCH/projects/ /proj/omics/bioinfo/scripts/slurm/mcgomics_fas
  $SCRATCH/project/samplenames.txt
 ```
 
-The samplenames.txt is a text file with one sample name per line, corresponding to the name of the FastQ file(s) (paired reads). 
-
 Output from this wrapper was:
 - trimmed reads (for forward and reverse sets, two fastq.gz files)
 - a trim report in html format
@@ -51,15 +55,47 @@ Output from this wrapper was:
 
 Planning resource allocation, I used 3GB of memory, 8 CPUs, and 45min of job time for a sample that was 20M reads of 151bp each.
 
+#### B. Trimmomatic
+
+I wrapped the trimming and QC in a shell script (mcgomics_trimmomatic.sh), and submitted the job to the Slurm scheduler:
+
+```sbatch mcgomics_trimmomatic.sh (input directory path) (output directory path) (optional text file of sample names) (extra) ```
+
+As with the other scripts, if you use the flag --chdir you can submit the SLURM job with respect to the directory and use relative paths:
+
+```
+sbatch --chdir=$SCRATCH/projects/ /proj/omics/bioinfo/scripts/slurm/mcgomics_trimmomatic.sh \
+ ./fastqs \
+ ./trimmomatic \
+ ./samplenames.txt \
+ "--cut-front"
+```
+
+The outputs of this trimming software for paired-end reads are:
+- (sample_name)_trim_fwd.fastq.gz
+- (sample_name)_trim_rev.fastq.gz
+- (sample_name)_unpaired_fwd.fastq.gz
+- (sample_name)_unpaired_rev.fastq.gz
+
+To get a summary of trimming, run a tool like seqkit as below (which uses wildcards to find all trimmed results within that directory):
+
+```
+sbatch --chdir=$SCRATCH/projects/trimmomatic/ \
+ --cpus-per-task=8 --time=4:00:00 --mem=8Gb \
+ --partition=scavenger --qos=scavenger --requeue \
+ --wrap="seqkit stats (sample_name)_trim_*fastq.gz -a -T -j 8 >> (sample_name)_trimmed_summary.tsv"
+```
+
+
 ---
 
 ### 2. MEGAHIT to assemble your metagenome
 
-After QC and trimming, (meta)genomic reads get assembled. I like to use [MEGAHIT](https://github.com/voutcn/megahit/). Just as with FastP, I wrapped the asssembly step in a shell script to submit as a Slurm job on our HPC:
+After QC and trimming, (meta)genomic reads get assembled. I like to use [MEGAHIT](https://github.com/voutcn/megahit/). Just as with trimming, I wrapped the asssembly step in a shell script to submit as a Slurm job on our HPC:
 
 ```sbatch mcgomics_megahit.sh (output directory) (directory with your trimmed reads) (optional: extra flags to pass to MEGAHIT such as "--continue")```
 
-That output from FastP can go right into this assembly step. You can also use symbolic links (symlinks) in a new directory, if you want to separate out your trimmed reads for different assemblies. 
+That output from trimming can go right into this assembly step. You can also use symbolic links (symlinks) in a new directory, if you want to separate out your trimmed reads for different assemblies. 
 
 Optional flags include "--continue" if you want to pick up an assembly you already started. 
 
@@ -217,6 +253,7 @@ Outputs from Prokka are:
 - (sample_coassembly).tsv *is list of genes called with product information*
 - (sample_coassembly).sqn *is a large json-like formatted file with genes, sequences, etc.*
 
+
 #### ii. Prodigal
 
 Or if you're like the majority of Prokka users and encounter unexplicable slowdowns at the tbl2asn step... call genes quickly with [prodigal](https://github.com/hyattpd/prodigal/wiki/cheat-sheet). No wrapper for this yet either but after you invoke a job ```srun``` or ```sbatch``` here's a start:
@@ -234,4 +271,4 @@ prodigal -i (path to your input fasta file) -p meta -f gff -g 11 &> prodigal.log
 
 Reach out if you have any questions or suggestions!
 
-*[Sharon Grim](sharon.grim@whoi.edu), 2024 April*
+*[Sharon Grim](sharon.grim@whoi.edu), 2026 July*
