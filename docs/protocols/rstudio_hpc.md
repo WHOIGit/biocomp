@@ -75,7 +75,7 @@ If you use these slurm scripts, by default you will install R packages into /use
 
 But sometimes even 'supported' packages installed via `install.packages()` or `BiocManager::install()` (*I'm looking at you, [Spiec-Easi](github.com/zdk123/SpiecEasi)*), can mess up your other packages. If you encounter issues when installing new packages, here is what I recommend:
 
-1. **If you're upgrading from a base.major.minor to base.major.minor+1 such as from  4.5.1 to 4.5.2:** Make a backup of your currrent (even if it's broken) package directory. In this example, let's try to triage 4.5.2 when (phyloseq)[https://joey711.github.io/phyloseq/] messed up (igraph)[https://r.igraph.org/]:
+1. **If you're upgrading from a base.major.minor to base.major.minor+1 such as from  4.5.1 to 4.5.2:** Make a backup of your currrent (even if it's broken) package directory. In this example, let's try to triage 4.5.2 when [phyloseq](https://joey711.github.io/phyloseq/) messed up [igraph](https://r.igraph.org/):
 
 ```
 mkdir -p ~/R/rocker-rstudio/backup_4.5.2
