@@ -11,6 +11,7 @@ At the moment this is pretty disorganized--many are pages I wrote on the [wiki](
   * [Parsing taxonomy of OTUs/ASVs](code-pages/taxonomy_parser.R) (R)
   * [Evaluating significant differential abundance of ASVs using Kruskal-Wallis testing](code-pages/kw_test.R) (R)
   * [Plotting abundance data in R using pheatmap](code-pages/00z_heatmap_example.R) (R)
+ * [RStudio on the HPC](protocols/rstudio_hpc.md) (bash and R)
 
 ----
 
